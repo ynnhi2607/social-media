@@ -6,6 +6,9 @@ dist/
 
 # environment variables
 .env
+.env.production
+.env.local
+.env*.local
 
 # logs
 npm-debug.log*

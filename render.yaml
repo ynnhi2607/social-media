@@ -1,0 +1,21 @@
+services:
+  # Backend API Server
+  - type: web
+    name: social-media-backend
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    dockerContext: ./server
+    envVars:
+      - key: PORT
+        value: 4000
+    healthCheckPath: /health
+
+  # Frontend Client
+  - type: web
+    name: social-media-frontend
+    runtime: docker
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: ./client
+    envVars:
+      - key: VITE_API_URL
+        sync: false

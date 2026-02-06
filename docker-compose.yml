@@ -4,6 +4,10 @@ services:
     container_name: backend
     ports:
       - "4000:4000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - db
 
   client:
     build: ./client
@@ -12,3 +16,19 @@ services:
       - "3000:80"
     depends_on:
       - server
+
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: social_media
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

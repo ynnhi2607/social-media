@@ -17,7 +17,13 @@ model User {
   id           String   @id @default(cuid())
   email        String   @unique
   username     String   @unique
-  passwordHash String
+  passwordHash String   @map("password_hash")
+  role         String   @default("user")
+  fullName     String?  @map("full_name")
+  bio          String?
+  status       String   @default("active")
+  rememberToken  String?  @map("remember_token")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  @@map("users")
 }

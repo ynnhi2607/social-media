@@ -25,5 +25,32 @@ model User {
   rememberToken  String?  @map("remember_token")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  posts        Post[]
   @@map("users")
 }
+
+model Post {
+  id          String    @id @default(cuid())
+
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  content     String?   @db.Text
+  privacy     String    @default("public") // public | friends | private
+
+  images      PostImage[]
+  likeCount   Int       @default(0)
+  cmtCount    Int       @default(0)
+  shareCount  Int       @default(0)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+model PostImage {
+  id          String    @id @default(cuid())
+  postId      String
+  url         String
+
+  post        Post      @relation(fields:[postId], references: [id], onDelete: Cascade)     
+}
+

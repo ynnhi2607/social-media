@@ -10,6 +10,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/social_media
     volumes:
       - ./server/prisma:/app/prisma
+      - ./server/src/generated:/app/src/generated
     depends_on:
       - db
 

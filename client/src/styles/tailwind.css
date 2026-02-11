@@ -1,0 +1,216 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary Colors */
+    --color-primary: #ffd8df; /* pink-200 - Soft rose */
+    --color-primary-foreground: #2d1b1e; /* gray-900 - Rich dark brown */
+
+    /* Secondary Colors */
+    --color-secondary: #ffaab8; /* pink-300 - Deeper rose */
+    --color-secondary-foreground: #ffffff; /* white */
+
+    /* Accent Colors */
+    --color-accent: #aedefc; /* blue-200 - Cool blue */
+    --color-accent-foreground: #1a2b3d; /* blue-900 - Deep blue */
+
+    /* Background Colors */
+    --color-background: #fefcfd; /* pink-50 - Warm white */
+    --color-foreground: #2d1b1e; /* gray-900 - Primary text */
+
+    /* Surface Colors */
+    --color-card: #f8f4f6; /* pink-100 - Elevated surface */
+    --color-card-foreground: #2d1b1e; /* gray-900 */
+
+    --color-popover: #f8f4f6; /* pink-100 */
+    --color-popover-foreground: #2d1b1e; /* gray-900 */
+
+    /* Muted Colors */
+    --color-muted: #f8f4f6; /* pink-100 */
+    --color-muted-foreground: #6b5b5e; /* gray-600 - Secondary text */
+
+    /* Border & Input */
+    --color-border: rgba(255, 216, 223, 0.2); /* primary/20 */
+    --color-input: #f8f4f6; /* pink-100 */
+    --color-ring: #ffd8df; /* pink-200 - Focus ring */
+
+    /* Status Colors */
+    --color-success: #b8e6b8; /* green-200 - Soft mint */
+    --color-success-foreground: #1b3b1b; /* green-900 */
+
+    --color-warning: #ffe4b8; /* orange-200 - Warm peach */
+    --color-warning-foreground: #3d2b1a; /* orange-900 */
+
+    --color-error: #ffb8c1; /* red-200 - Gentle coral */
+    --color-error-foreground: #3d1a1e; /* red-900 */
+
+    --color-destructive: #ffb8c1; /* red-200 */
+    --color-destructive-foreground: #3d1a1e; /* red-900 */
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+  }
+
+  .dark {
+    /* Primary Colors - Dark Mode */
+    --color-primary: #cc8a93; /* pink-400 - Reduced vibrancy */
+    --color-primary-foreground: #e6e6e6; /* gray-200 - 90% white */
+
+    /* Secondary Colors - Dark Mode */
+    --color-secondary: #b37782; /* pink-500 */
+    --color-secondary-foreground: #e6e6e6; /* gray-200 */
+
+    /* Accent Colors - Dark Mode */
+    --color-accent: #7ba8c4; /* blue-400 - Reduced vibrancy */
+    --color-accent-foreground: #e6e6e6; /* gray-200 */
+
+    /* Background Colors - Dark Mode */
+    --color-background: #1a1618; /* gray-950 - Warm dark */
+    --color-foreground: #e6e6e6; /* gray-200 - 90% white */
+
+    /* Surface Colors - Dark Mode */
+    --color-card: #2a2225; /* gray-900 - Elevated surface */
+    --color-card-foreground: #e6e6e6; /* gray-200 */
+
+    --color-popover: #2a2225; /* gray-900 */
+    --color-popover-foreground: #e6e6e6; /* gray-200 */
+
+    /* Muted Colors - Dark Mode */
+    --color-muted: #3a3235; /* gray-800 */
+    --color-muted-foreground: #b3b3b3; /* gray-400 - 70% white */
+
+    /* Border & Input - Dark Mode */
+    --color-border: rgba(204, 138, 147, 0.2); /* primary/20 */
+    --color-input: #2a2225; /* gray-900 */
+    --color-ring: #cc8a93; /* pink-400 */
+
+    /* Status Colors - Dark Mode */
+    --color-success: #8cb38c; /* green-400 */
+    --color-success-foreground: #e6e6e6; /* gray-200 */
+
+    --color-warning: #ccb38c; /* orange-400 */
+    --color-warning-foreground: #e6e6e6; /* gray-200 */
+
+    --color-error: #cc8c93; /* red-400 */
+    --color-error-foreground: #e6e6e6; /* gray-200 */
+
+    --color-destructive: #cc8c93; /* red-400 */
+    --color-destructive-foreground: #e6e6e6; /* gray-200 */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Nunito", sans-serif;
+  }
+
+  h1 {
+    font-size: 2.25rem;
+    line-height: 1.2;
+    font-weight: 800;
+  }
+
+  h2 {
+    font-size: 1.875rem;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  h4 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  h5 {
+    font-size: 1.125rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  caption,
+  label,
+  .caption {
+    font-family: "Poppins", sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    letter-spacing: 0.025em;
+  }
+
+  code,
+  .monospace {
+    font-family: "JetBrains Mono", monospace;
+    font-feature-settings: "tnum" 1;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 15px;
+      line-height: 1.65;
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: var(--color-muted);
+    border-radius: 4px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+  }
+
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: var(--color-secondary);
+  }
+}

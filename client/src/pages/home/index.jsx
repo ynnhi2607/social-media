@@ -1,63 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/ui/Header";
+import CreatePostFAB from "../../components/ui/CreatePostFAB";
+import StoryCarousel from "./components/StoryCarousel";
+import CreatePost from "./components/CreatePost";
 import PostCard from "./components/PostCard";
+import PostSkeleton from "./components/PostSkeleton";
+import SuggestedUsers from "./components/SuggestedUsers";
+import TrendingTopics from "./components/TrendingTopics";
+import CreatePostModal from "./components/CreatePostModal";
+import * as postService from "../../services/postService";
 
 const Home = () => {
   const navigate = useNavigate();
-
-  // Function để generate mock posts
-  const generateInitialPosts = () => {
-    const mockPostsData = [
-      {
-        id: 1,
-        userName: "Sarah Johnson",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_1ccaed995-1763294687911.png",
-        userAvatarAlt:
-          "Professional woman with shoulder-length blonde hair in light blue blouse smiling confidently",
-        timestamp: new Date(Date.now() - 3600000),
-        content:
-          "Just finished an amazing project with the team! The pastel color palette we chose really brought everything together. Can't wait to share more details soon! 🎨✨",
-        media: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1566647387313-9fda80664848",
-            alt: "Modern workspace desk with laptop computer showing colorful design software, pastel pink notebook, white coffee mug, and succulent plant in soft natural lighting",
-          },
-        ],
-        likes: 234,
-        comments: 45,
-        isLiked: false,
-      },
-      {
-        id: 2,
-        userName: "Marcus Williams",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_1d09b35e1-1763296580927.png",
-        userAvatarAlt:
-          "African American man with short hair and warm smile wearing casual gray hoodie outdoors",
-        timestamp: new Date(Date.now() - 7200000),
-        content:
-          "Beautiful sunset at the beach today! Nature never fails to inspire. 🌅\n\nTaking a moment to appreciate the simple things in life. What's inspiring you today?",
-        media: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1734540881994-10e30233373a",
-            alt: "Stunning sunset over ocean beach with orange and pink sky reflecting on calm water, silhouette of person standing on sandy shore",
-          },
-        ],
-        likes: 567,
-        comments: 89,
-        isLiked: true,
-      },
-    ];
-    return mockPostsData;
-  };
-
-  const [posts, setPosts] = useState(generateInitialPosts);
-  const [loading, setLoading] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(2); // Start từ page 2 vì đã load page 1
+  const [page, setPage] = useState(1);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
   const observerRef = useRef(null);
   const loadingRef = useRef(null);
 
@@ -156,154 +118,80 @@ const Home = () => {
     { hashtag: "#DigitalArt", posts: 24800 },
   ];
 
-  const generateMockPosts = (pageNum) => {
-    const postsPerPage = 5;
-    const startId = (pageNum - 1) * postsPerPage + 1;
+  const POSTS_PER_PAGE = 20;
 
-    const mockPostsData = [
-      {
-        id: startId,
-        userName: "Sarah Johnson",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_1ccaed995-1763294687911.png",
-        userAvatarAlt:
-          "Professional woman with shoulder-length blonde hair in light blue blouse smiling confidently",
-        timestamp: new Date(Date.now() - 3600000),
-        content:
-          "Just finished an amazing project with the team! The pastel color palette we chose really brought everything together. Can\'t wait to share more details soon! 🎨✨",
-        media: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1566647387313-9fda80664848",
-            alt: "Modern workspace desk with laptop computer showing colorful design software, pastel pink notebook, white coffee mug, and succulent plant in soft natural lighting",
-          },
-        ],
-
-        likes: 234,
-        comments: 45,
-        isLiked: false,
-      },
-      {
-        id: startId + 1,
-        userName: "Marcus Williams",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_1d09b35e1-1763296580927.png",
-        userAvatarAlt:
-          "African American man with short hair and warm smile wearing casual gray hoodie outdoors",
-        timestamp: new Date(Date.now() - 7200000),
-        content:
-          "Beautiful sunset at the beach today! Nature never fails to inspire. 🌅\n\nTaking a moment to appreciate the simple things in life. What's inspiring you today?",
-        media: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1734540881994-10e30233373a",
-            alt: "Stunning sunset over ocean beach with orange and pink sky reflecting on calm water, silhouette of person standing on sandy shore",
-          },
-        ],
-
-        likes: 567,
-        comments: 89,
-        isLiked: true,
-      },
-      {
-        id: startId + 2,
-        userName: "Emily Chen",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_189a307e9-1763295306313.png",
-        userAvatarAlt:
-          "Young Asian woman with long black hair in white t-shirt with bright cheerful smile in urban setting",
-        timestamp: new Date(Date.now() - 10800000),
-        content:
-          "New blog post is live! Sharing my top 10 productivity tips for remote workers. Link in bio! 💻📝",
-        media: [],
-        likes: 189,
-        comments: 34,
-        isLiked: false,
-      },
-      {
-        id: startId + 3,
-        userName: "Daniel Martinez",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_14dd11a18-1763296507603.png",
-        userAvatarAlt:
-          "Hispanic man with short dark hair and beard in navy blue shirt with confident professional expression",
-        timestamp: new Date(Date.now() - 14400000),
-        content:
-          "Coffee and code - the perfect combination for a productive morning! ☕💻\n\nWorking on something exciting that I can't wait to share with you all.",
-        media: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1703647113881-4bd028df841f",
-            alt: "Close-up of hands typing on laptop keyboard with steaming coffee cup beside it, warm indoor lighting creating cozy workspace atmosphere",
-          },
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1702390683294-d5eda56112a3",
-            alt: "Modern minimalist desk setup with laptop, notebook, pen, and small potted plant against white background",
-          },
-        ],
-
-        likes: 423,
-        comments: 67,
-        isLiked: false,
-      },
-      {
-        id: startId + 4,
-        userName: "Olivia Thompson",
-        userAvatar:
-          "https://img.rocket.new/generatedImages/rocket_gen_img_1dd35fb3c-1766579843915.png",
-        userAvatarAlt:
-          "Woman with curly red hair in green sweater with warm friendly smile in natural outdoor setting",
-        timestamp: new Date(Date.now() - 18000000),
-        content:
-          "Throwback to last weekend\'s hiking adventure! The views were absolutely breathtaking. Already planning the next trip! 🏔️🥾",
-        media: [
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1735578123549-4cf3670dfb1c",
-            alt: "Panoramic mountain landscape view with green valleys, rocky peaks, and blue sky with white clouds from hiking trail",
-          },
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1529289252419-03cfc364face",
-            alt: "Hiker with backpack standing on mountain summit overlooking vast wilderness landscape during golden hour",
-          },
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1589989410241-fab0c86836a1",
-            alt: "Narrow mountain trail winding through pine forest with sunlight filtering through trees",
-          },
-          {
-            type: "image",
-            url: "https://images.unsplash.com/photo-1559506026-201e819588ec",
-            alt: "Close-up of hiking boots on rocky mountain path with scenic valley view in background",
-          },
-        ],
-
-        likes: 892,
-        comments: 156,
-        isLiked: true,
-      },
-    ];
-
-    return mockPostsData;
+  const transformPostData = (apiPost) => {
+    return {
+      id: apiPost.id,
+      userName:
+        apiPost.author?.fullName || apiPost.author?.username || "Unknown User",
+      userAvatar:
+        apiPost.author?.profilePicture || "https://via.placeholder.com/150",
+      userAvatarAlt: `${apiPost.author?.fullName || apiPost.author?.username}'s avatar`,
+      timestamp: new Date(apiPost.createdAt),
+      content: apiPost.content,
+      media:
+        apiPost.images?.map((img) => ({
+          type: "image",
+          url: img.url,
+          alt: `Image from ${apiPost.author?.username}'s post`,
+        })) || [],
+      likes: apiPost.likesCount || 0,
+      comments: apiPost.commentsCount || 0,
+      isLiked: apiPost.isLiked || false,
+      privacy: apiPost.privacy,
+      authorId: apiPost.author?.id,
+    };
   };
 
-  const loadMorePosts = useCallback(() => {
+  const loadMorePosts = useCallback(async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
 
-    // Load ngay lập tức không delay
-    const newPosts = generateMockPosts(page);
-    setPosts((prev) => [...prev, ...newPosts]);
-    setPage((prev) => prev + 1);
-    setLoading(false);
+    try {
+      const offset = (page - 1) * POSTS_PER_PAGE;
+      const apiPosts = await postService.getAllPosts(POSTS_PER_PAGE, offset);
 
-    if (page >= 4) {
+      if (apiPosts.length === 0) {
+        setHasMore(false);
+      } else {
+        const transformedPosts = apiPosts.map(transformPostData);
+        setPosts((prev) => [...prev, ...transformedPosts]);
+        setPage((prev) => prev + 1);
+
+        if (apiPosts.length < POSTS_PER_PAGE) {
+          setHasMore(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading posts:", error);
       setHasMore(false);
+    } finally {
+      setLoading(false);
     }
   }, [page, loading, hasMore]);
+
+  const refreshPosts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setPosts([]);
+
+      const apiPosts = await postService.getAllPosts(POSTS_PER_PAGE, 0);
+      const transformedPosts = apiPosts.map(transformPostData);
+      setPosts(transformedPosts);
+      setPage(2);
+      setHasMore(apiPosts.length >= POSTS_PER_PAGE);
+    } catch (error) {
+      console.error("Error refreshing posts:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadMorePosts();
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -352,12 +240,55 @@ const Home = () => {
     console.log(`Follow user ${userId}`);
   };
 
+  const handleDeletePost = async (postId) => {
+    try {
+      await postService.deletePost(postId);
+      // Refresh posts to show updated list
+      await refreshPosts();
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      alert("Failed to delete post. Please try again.");
+    }
+  };
+
+  const handleEditPost = (post) => {
+    setEditingPost(post);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingPost(null);
+  };
+
+  const handlePostSuccess = async () => {
+    // Refresh posts after create/edit
+    await refreshPosts();
+  };
+
+  const handleOpenCreateModal = () => {
+    setShowCreateModal(true);
+  };
+
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <main className="pt-16 pb-20 lg:pb-6">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
             <div className="lg:col-span-8 space-y-4 md:space-y-6">
+              <StoryCarousel
+                stories={mockStories}
+                onCreateStory={handleCreateStory}
+                onStoryClick={handleStoryClick}
+              />
+
+              <CreatePost onPostCreated={handlePostSuccess} />
+
               <div className="space-y-4 md:space-y-6">
                 {posts?.map((post) => (
                   <PostCard
@@ -366,25 +297,20 @@ const Home = () => {
                     onLike={handleLike}
                     onComment={handleComment}
                     onShare={handleShare}
+                    onDelete={handleDeletePost}
+                    onEdit={handleEditPost}
                   />
                 ))}
+
                 {loading && (
-                  <div className="bg-card rounded-xl p-6 animate-pulse">
-                    <div className="flex items-start gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-muted"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-muted rounded w-32 mb-2"></div>
-                        <div className="h-3 bg-muted rounded w-20"></div>
-                      </div>
-                    </div>
-                    <div className="space-y-2 mb-4">
-                      <div className="h-4 bg-muted rounded w-full"></div>
-                      <div className="h-4 bg-muted rounded w-3/4"></div>
-                    </div>
-                    <div className="h-64 bg-muted rounded"></div>
-                  </div>
+                  <>
+                    <PostSkeleton />
+                    <PostSkeleton />
+                  </>
                 )}
+
                 <div ref={loadingRef} className="h-4" />
+
                 {!hasMore && posts?.length > 0 && (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground text-sm md:text-base">
@@ -396,11 +322,34 @@ const Home = () => {
             </div>
 
             <aside className="hidden lg:block lg:col-span-4 space-y-4 md:space-y-6">
-              <div className="sticky top-20 space-y-4 md:space-y-6"></div>
+              <div className="sticky top-20 space-y-4 md:space-y-6">
+                <SuggestedUsers
+                  users={mockSuggestedUsers}
+                  onFollow={handleFollow}
+                />
+
+                <TrendingTopics topics={mockTrendingTopics} />
+              </div>
             </aside>
           </div>
         </div>
       </main>
+      <CreatePostFAB onClick={handleOpenCreateModal} />
+
+      {/* Create Post Modal (from FAB) */}
+      <CreatePostModal
+        isOpen={showCreateModal}
+        onClose={handleCloseCreateModal}
+        onSuccess={handlePostSuccess}
+      />
+
+      {/* Edit Post Modal */}
+      <CreatePostModal
+        isOpen={showEditModal}
+        onClose={handleCloseEditModal}
+        onSuccess={handlePostSuccess}
+        editPost={editingPost}
+      />
     </div>
   );
 };

@@ -8,7 +8,7 @@ import axiosInstance from "../api/axios";
  */
 export const getAllPosts = async (limit = 20, offset = 0) => {
   try {
-    const response = await axiosInstance.get("/posts", {
+    const response = await axiosInstance.get("/api/posts", {
       params: { limit, offset },
     });
     return response.data;
@@ -25,7 +25,7 @@ export const getAllPosts = async (limit = 20, offset = 0) => {
  */
 export const getPostById = async (postId) => {
   try {
-    const response = await axiosInstance.get(`/posts/${postId}`);
+    const response = await axiosInstance.get(`/api/posts/${postId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching post:", error);
@@ -40,7 +40,7 @@ export const getPostById = async (postId) => {
  */
 export const getPostsByUserId = async (userId) => {
   try {
-    const response = await axiosInstance.get(`/posts/user/${userId}`);
+    const response = await axiosInstance.get(`/api/posts/user/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user posts:", error);
@@ -58,7 +58,7 @@ export const getPostsByUserId = async (userId) => {
  */
 export const createPost = async (postData) => {
   try {
-    const response = await axiosInstance.post("/posts", postData);
+    const response = await axiosInstance.post("/api/posts", postData);
     return response.data;
   } catch (error) {
     console.error("Error creating post:", error);
@@ -77,7 +77,7 @@ export const createPost = async (postData) => {
  */
 export const updatePost = async (postId, postData) => {
   try {
-    const response = await axiosInstance.put(`/posts/${postId}`, postData);
+    const response = await axiosInstance.put(`/api/posts/${postId}`, postData);
     return response.data;
   } catch (error) {
     console.error("Error updating post:", error);
@@ -92,7 +92,7 @@ export const updatePost = async (postId, postData) => {
  */
 export const deletePost = async (postId) => {
   try {
-    await axiosInstance.delete(`/posts/${postId}`);
+    await axiosInstance.delete(`/api/posts/${postId}`);
   } catch (error) {
     console.error("Error deleting post:", error);
     throw error;

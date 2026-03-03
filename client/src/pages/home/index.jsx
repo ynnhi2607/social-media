@@ -9,7 +9,9 @@ import PostSkeleton from "./components/PostSkeleton";
 import SuggestedUsers from "./components/SuggestedUsers";
 import TrendingTopics from "./components/TrendingTopics";
 import CreatePostModal from "./components/CreatePostModal";
+import QuickLogin from "../../components/QuickLogin";
 import * as postService from "../../services/postService";
+import * as authService from "../../services/authService";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,6 +22,10 @@ const Home = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
+  const [currentUser, setCurrentUser] = useState(authService.getUser());
+  const [showQuickLogin, setShowQuickLogin] = useState(
+    !authService.isAuthenticated(),
+  );
   const observerRef = useRef(null);
   const loadingRef = useRef(null);
 
@@ -274,8 +280,16 @@ const Home = () => {
     setShowCreateModal(false);
   };
 
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    setShowQuickLogin(false);
+    // Reload posts after login
+    loadInitialPosts();
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {showQuickLogin && <QuickLogin onLoginSuccess={handleLoginSuccess} />}
       <Header />
       <main className="pt-16 pb-20 lg:pb-6">
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6">

@@ -45,6 +45,14 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
       return;
     }
 
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You need to login first to create a post!");
+      console.error("No token found. User needs to login.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -53,6 +61,9 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
         privacy,
         imageUrls: imageUrls.length > 0 ? imageUrls : undefined,
       };
+
+      console.log("Creating post with data:", postData);
+      console.log("Token exists:", !!token);
 
       if (editPost) {
         await postService.updatePost(editPost.id, postData);
@@ -64,9 +75,22 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
       onClose();
     } catch (error) {
       console.error("Error saving post:", error);
-      alert(
-        `Failed to ${editPost ? "update" : "create"} post. Please try again.`
-      );
+
+      // Better error messages
+      let errorMsg = `Failed to ${editPost ? "update" : "create"} post. `;
+      if (error.code === "ECONNABORTED") {
+        errorMsg += "Request timeout. Please check your connection.";
+      } else if (error.response?.status === 401) {
+        errorMsg += "You need to login again.";
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      } else if (error.response?.status === 400) {
+        errorMsg += error.response.data?.message || "Invalid request.";
+      } else {
+        errorMsg += "Please try again later.";
+      }
+
+      alert(errorMsg);
     } finally {
       setLoading(false);
     }

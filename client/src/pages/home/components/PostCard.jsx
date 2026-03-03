@@ -4,12 +4,13 @@ import Icon from "../../../components/AppIcon";
 import Image from "../../../components/AppImage";
 import Button from "../../../components/ui/Button";
 
-const PostCard = ({ post, onLike, onComment, onShare }) => {
+const PostCard = ({ post, onLike, onComment, onShare, onDelete, onEdit }) => {
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(post?.isLiked);
   const [likeCount, setLikeCount] = useState(post?.likes);
   const [showFullText, setShowFullText] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleLike = (e) => {
     e?.stopPropagation();
@@ -36,6 +37,25 @@ const PostCard = ({ post, onLike, onComment, onShare }) => {
   const handleUserClick = (e) => {
     e?.stopPropagation();
     navigate("/user-profile");
+  };
+
+  const handleEdit = (e) => {
+    e?.stopPropagation();
+    setShowMenu(false);
+    onEdit && onEdit(post);
+  };
+
+  const handleDelete = async (e) => {
+    e?.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this post?")) {
+      onDelete && onDelete(post?.id);
+    }
+    setShowMenu(false);
+  };
+
+  const toggleMenu = (e) => {
+    e?.stopPropagation();
+    setShowMenu(!showMenu);
   };
 
   const formatTimestamp = (timestamp) => {
@@ -89,13 +109,43 @@ const PostCard = ({ post, onLike, onComment, onShare }) => {
             </p>
           </div>
 
-          <button
-            onClick={(e) => e?.stopPropagation()}
-            className="p-2 hover:bg-muted rounded-lg transition-colors duration-250"
-            aria-label="More options"
-          >
-            <Icon name="MoreVertical" size={20} />
-          </button>
+          <div className="relative">
+            <button
+              onClick={toggleMenu}
+              className="p-2 hover:bg-muted rounded-lg transition-colors duration-250"
+              aria-label="More options"
+            >
+              <Icon name="MoreVertical" size={20} />
+            </button>
+
+            {showMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={(e) => {
+                    e?.stopPropagation();
+                    setShowMenu(false);
+                  }}
+                />
+                <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-20 overflow-hidden">
+                  <button
+                    onClick={handleEdit}
+                    className="w-full px-4 py-2.5 text-left flex items-center gap-2 hover:bg-muted transition-colors text-foreground"
+                  >
+                    <Icon name="Edit" size={18} />
+                    <span className="text-sm">Edit Post</span>
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="w-full px-4 py-2.5 text-left flex items-center gap-2 hover:bg-muted transition-colors text-error"
+                  >
+                    <Icon name="Trash2" size={18} />
+                    <span className="text-sm">Delete Post</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         <div className="mb-4">
           <p className="text-sm md:text-base text-foreground whitespace-pre-wrap break-words">

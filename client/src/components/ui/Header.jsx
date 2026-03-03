@@ -201,7 +201,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate("/create-post")}
+              onClick={() => navigate("/")}
               className="relative"
               aria-label="Create post"
             >
@@ -449,7 +449,7 @@ const Header = () => {
                 iconPosition="left"
                 onClick={() => {
                   handleMobileMenuToggle();
-                  navigate("/create-post");
+                  navigate("/");
                 }}
               >
                 Create Post
@@ -471,7 +471,7 @@ const Header = () => {
           </Link>
 
           <button
-            onClick={() => navigate("/create-post")}
+            onClick={() => navigate("/")}
             className="flex flex-col items-center gap-1 p-2 rounded-lg text-muted-foreground transition-colors duration-250"
           >
             <Icon name="Plus" size={24} />

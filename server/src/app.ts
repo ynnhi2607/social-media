@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.route.js";
 import postRoutes from "./routes/post.route.js";
 import userRoutes from "./routes/user.route.js";
+import uploadRoutes from "./routes/upload.route.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -17,6 +18,7 @@ app.get("/health", (_, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/upload", uploadRoutes);
 
 // Error handler
 app.use(errorHandler);

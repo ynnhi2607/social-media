@@ -2,7 +2,13 @@
 
 Full-stack social media platform với React frontend và Node.js backend.
 
-## 📋 Tech Stack
+## � Documentation
+
+- 📖 **[Deployment Guide](./DEPLOYMENT.md)** - Production deployment & environment variables
+- 📸 **[Cloudinary Setup](./CLOUDINARY_SETUP.md)** - Image upload configuration
+- 🔧 **[Fixes Log](./FIXES.md)** - Bug fixes history
+
+## �📋 Tech Stack
 
 ### Frontend
 
@@ -47,7 +53,14 @@ PORT=4000
 DATABASE_URL=postgresql://postgres:postgres@db:5432/social_media
 JWT_SECRET=your-secret-key-here-change-this-in-production
 NODE_ENV=development
+
+# Cloudinary (for image uploads) - Get from https://cloudinary.com/console
+CLOUDINARY_CLOUD_NAME=your_cloud_name_here
+CLOUDINARY_API_KEY=your_api_key_here
+CLOUDINARY_API_SECRET=your_api_secret_here
 ```
+
+> 📸 **Image Upload:** Cần setup Cloudinary để upload ảnh. Xem chi tiết: [CLOUDINARY_SETUP.md](./CLOUDINARY_SETUP.md)
 
 **Frontend** - Tạo file `client/.env`:
 
@@ -321,24 +334,30 @@ docker exec -it postgres_db psql -U postgres -d social_media
 - User registration & authentication (JWT)
 - Login/Logout
 - Create posts (text + images)
+- **📸 Image upload từ device (Cloudinary CDN)**
+- Upload multiple images (max 4 per post)
+- Auto resize & optimize images
+- Image preview và remove
+- Support paste image URL (alternative)
 - View all posts
 - Edit own posts
 - Delete own posts
 - View posts by user
 - Quick login widget
+- Infinite scroll pagination
 
 ### 🚧 TODO (có thể thêm):
 
 - Like posts
 - Comment on posts
 - Share posts
-- User profiles
+- User profiles & avatar upload
 - Follow/Unfollow users
 - Real-time notifications
-- Image upload (currently URL only)
 - Search functionality
 - Dark mode
 - Mobile responsive improvements
+- Image cropper before upload
 
 ---
 
@@ -363,6 +382,14 @@ docker exec -it postgres_db psql -U postgres -d social_media
 | POST   | `/api/posts`              | ✅            | `{content, privacy, imageUrls?}`   | `{post}`         |
 | PUT    | `/api/posts/:id`          | ✅            | `{content?, privacy?, imageUrls?}` | `{post}`         |
 | DELETE | `/api/posts/:id`          | ✅            | -                                  | `204 No Content` |
+
+### Upload Endpoints
+
+| Method | Endpoint               | Auth Required | Body                       | Response                         |
+| ------ | ---------------------- | ------------- | -------------------------- | -------------------------------- |
+| POST   | `/api/upload/single`   | ✅            | FormData: `image` (file)   | `{url, publicId, width, height}` |
+| POST   | `/api/upload/multiple` | ✅            | FormData: `images` (files) | `[{url, publicId, ...}, ...]`    |
+| DELETE | `/api/upload/delete`   | ✅            | `{publicId}`               | `{success: true}`                |
 
 **Auth Required** = Cần `Authorization: Bearer <token>` header
 

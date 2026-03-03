@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import Icon from "../../../components/AppIcon";
 import * as postService from "../../../services/postService";
+import * as uploadService from "../../../services/uploadService";
 
 const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
   const [content, setContent] = useState("");
@@ -10,6 +11,8 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
   const [imageUrls, setImageUrls] = useState([]);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (isOpen && editPost) {
@@ -35,6 +38,64 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
 
   const handleRemoveImage = (index) => {
     setImageUrls(imageUrls.filter((_, i) => i !== index));
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length === 0) return;
+
+    // Check if adding these files would exceed limit
+    if (imageUrls.length + files.length > 4) {
+      alert(
+        `You can only upload up to 4 images. Currently you have ${imageUrls.length} images.`,
+      );
+      return;
+    }
+
+    // Validate file types and sizes
+    const validFiles = [];
+    for (const file of files) {
+      // Check file type
+      if (!file.type.startsWith("image/")) {
+        alert(`${file.name} is not an image file.`);
+        continue;
+      }
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert(`${file.name} is too large. Maximum size is 5MB.`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) return;
+
+    try {
+      setUploading(true);
+
+      // Upload files to Cloudinary
+      const uploadedUrls = await uploadService.uploadMultipleImages(validFiles);
+
+      // Add to imageUrls array
+      setImageUrls((prev) => [...prev, ...uploadedUrls]);
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Failed to upload images. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleSubmit = async (e) => {
@@ -155,7 +216,7 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
                     className="w-full h-40 object-cover rounded-lg border border-border"
                     onError={(e) => {
                       e.target.src =
-                        "https://via.placeholder.com/400x300?text=Invalid+URL";
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23ddd'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%23999'%3EInvalid Image%3C/text%3E%3C/svg%3E";
                     }}
                   />
                   <button
@@ -173,29 +234,76 @@ const CreatePostModal = ({ isOpen, onClose, onSuccess, editPost = null }) => {
 
           {/* Add new image */}
           {imageUrls.length < 4 && (
-            <div className="flex gap-2">
-              <input
-                type="url"
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddImage();
-                  }
-                }}
-                placeholder="Enter image URL"
-                className="flex-1 px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder-muted-foreground"
-                disabled={loading}
-              />
-              <Button
-                type="button"
-                onClick={handleAddImage}
-                variant="outline"
-                disabled={!newImageUrl.trim() || loading}
-              >
-                <Icon name="Plus" size={20} />
-              </Button>
+            <div className="space-y-3">
+              {/* File upload button */}
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  disabled={loading || uploading}
+                />
+                <Button
+                  type="button"
+                  onClick={handleUploadClick}
+                  variant="outline"
+                  className="w-full"
+                  disabled={loading || uploading}
+                >
+                  {uploading ? (
+                    <>
+                      <Icon name="Loader" size={20} className="animate-spin" />
+                      <span>Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Upload" size={20} />
+                      <span>Upload from Device</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="px-2 bg-background text-muted-foreground">
+                    OR
+                  </span>
+                </div>
+              </div>
+
+              {/* URL input */}
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddImage();
+                    }
+                  }}
+                  placeholder="Or paste image URL"
+                  className="flex-1 px-4 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder-muted-foreground"
+                  disabled={loading || uploading}
+                />
+                <Button
+                  type="button"
+                  onClick={handleAddImage}
+                  variant="outline"
+                  disabled={!newImageUrl.trim() || loading || uploading}
+                >
+                  <Icon name="Plus" size={20} />
+                </Button>
+              </div>
             </div>
           )}
         </div>

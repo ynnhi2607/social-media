@@ -127,13 +127,15 @@ const Home = () => {
   const POSTS_PER_PAGE = 20;
 
   const transformPostData = (apiPost) => {
+    const userName =
+      apiPost.author?.fullName || apiPost.author?.username || "Unknown User";
+    const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&size=150`;
+
     return {
       id: apiPost.id,
-      userName:
-        apiPost.author?.fullName || apiPost.author?.username || "Unknown User",
-      userAvatar:
-        apiPost.author?.profilePicture || "https://via.placeholder.com/150",
-      userAvatarAlt: `${apiPost.author?.fullName || apiPost.author?.username}'s avatar`,
+      userName: userName,
+      userAvatar: apiPost.author?.profilePicture || defaultAvatar,
+      userAvatarAlt: `${userName}'s avatar`,
       timestamp: new Date(apiPost.createdAt),
       content: apiPost.content,
       media:

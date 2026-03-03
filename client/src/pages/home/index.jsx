@@ -16,7 +16,7 @@ import * as authService from "../../services/authService";
 const Home = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -284,7 +284,7 @@ const Home = () => {
     setCurrentUser(user);
     setShowQuickLogin(false);
     // Reload posts after login
-    loadInitialPosts();
+    refreshPosts();
   };
 
   return (

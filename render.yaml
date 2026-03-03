@@ -32,3 +32,9 @@ services:
     envVars:
       - key: VITE_API_URL
         sync: false
+
+# PostgreSQL Database
+databases:
+  - name: social-media-db
+    databaseName: social_media
+    user: social_media_user

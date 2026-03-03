@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
+    "start:prod": "prisma migrate deploy && node dist/server.js",
     "migrate": "prisma migrate dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
